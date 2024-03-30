@@ -1,11 +1,14 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./dist/**/*.{html,js}",'./dist/assets/icons/*.svg'],
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
-    container: {
-      center: true,
-      padding: "1rem",
-    },
+      container: {
+        center: true,
+        padding: "1rem",
+      },
     extend: {
       fontFamily: {
         inter: ["Inter", "sans-serif"],
@@ -18,6 +21,10 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
-};
+  plugins: [
+   
+    require('@tailwindcss/typography'),
+  ],
+}
+
 
