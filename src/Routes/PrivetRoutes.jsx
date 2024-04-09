@@ -8,12 +8,15 @@ const PrivetRoutes = () => {
   return (
     <>
       {auth.user ? (
+        <>
+          <Header/>
         <main className="mx-w-[1020px] mx-auto py-8">
           <div className="container">
-            <Header/>
             <Outlet />
           </div>
         </main>
+        </>
+        
       ) : (
         <Navigate />
       )}
