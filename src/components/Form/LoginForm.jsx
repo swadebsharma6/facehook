@@ -15,34 +15,37 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async(data) => {
+  const onSubmit = async (data) => {
     console.log(data);
-    // Make an Api Call will
-    try{
-      const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/auth/login`, data);
-      console.log(response)
 
-      if(response.status === 200){
-        const {token, user} = response.data;
-        if(token){
+    // Make an Api Call will return and Login user info
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_BASE_URL}/auth/login`,
+        data
+      );
+      console.log(response);
+
+      if (response.status === 200) {
+        const { token, user } = response.data;
+        if (token) {
           const authToken = token.token;
           const refreshToken = token.refreshToken;
 
-          console.log(`Login time auth Token: ${authToken} `)
-          setAuth({user, authToken, refreshToken});
+          console.log(`Login time auth Token: ${authToken}  `);
+          setAuth({ user, authToken, refreshToken });
 
           navigate("/");
         }
       }
-    }
-    catch(error){
-      console.log(error);
+    } catch (error) {
+      // console.log(error);
       setError("root.random", {
-        type:"random",
-        message: `User with email ${data.email} is not found`
-      })
+        type: "random",
+        message: `User with email ${data.email} is not found`,
+      });
     }
-   
   };
 
   return (
@@ -84,7 +87,7 @@ const LoginForm = () => {
             </span>
           )}
         </div>
-          <p>{errors?.root?.random?.message}</p>
+        <p>{errors?.root?.random?.message}</p>
         <button
           className="auth-input bg-lwsGreen font-bold text-deepDark transition-all hover:opacity-90"
           type="submit"

@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import homeIcon from '../../assets/icons/home.svg';
 
 import NotificationIcon from '../../assets/icons/notification.svg';
-import Avatar from '../../assets/images/avatars/avater-1.png';
 import FbLogo from '../../assets/images/fblogo.png';
 import Logout from "../Form/Logout";
+import { useAuth } from "../../hooks/useAuth";
 
 const Header = () => {
+  const {auth} = useAuth();
+  console.log(auth)
     return (
         <nav className="sticky top-0 z-50 border-b border-[#3F3F3F] bg-[#1E1F24] py-4">
         <div className="container flex flex-col items-center justify-between gap-6 sm:flex-row">
@@ -33,7 +35,7 @@ const Header = () => {
             <button className="flex-center !ml-8 gap-3">
               <Link to='/me'>
               <img className="max-h-[32px] max-w-[32px] lg:max-h-[44px] lg:max-w-[44px]"
-                src={Avatar} alt=""  width={50}/>
+                src={auth.user.avatar} alt=""  width={50}/>
               </Link>
             </button>
           </div>
