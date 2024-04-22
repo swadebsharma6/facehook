@@ -1,53 +1,53 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useAxios from "../hooks/useAxios";
 import { useAuth } from "../hooks/useAuth";
+import { useProfile } from "../hooks/useProfile";
+import { actions } from "../actions";
+import ProfileInfo from "../components/Profile/ProfileInfo";
+import MyPosts from "../components/Profile/MyPosts";
 
 
 
 const ProfilePage = () => {
 
-    const [user, setUser] = useState(null);
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const {state, dispatch} = useProfile();
 
     const {api} = useAxios();
     const {auth} =useAuth();
 
-    console.log(user)
-    console.log(posts)
+ 
 
 
     useEffect(()=>{
-        setLoading(true)
+        // dispatch({type:actions.type.profile.DATA_FETCHING})
         const fetchProfile = async()=>{
             try{
                 const response = await api.get(`${import.meta.env.VITE_SERVER_BASE_URL}/profile/${auth?.user?.id}`);
-                setUser(response.data.user);
-                setPosts(response.data.posts);
+                
+                if(response.status === 200){
+                    dispatch({type: actions.profile.DATA_FETCHED, data: response.data})
+                }
 
             }catch(error){
                 console.log(error.message);
-                setError(error)
-            }finally{
-                setLoading(false);
+               dispatch({type: actions.profile.DATA_FETCHED_ERROR, error: error.message})
             }
         };
 
         fetchProfile();
-    }, [api, auth.user.id]);
+    }, [api, auth.user.id, dispatch]);
 
 
-    if(loading){
+    if(state?.loading){
         return <div>Fetching your Profile data</div>
     }
 
 
     return (
-        <div>
-        Welcome,  {user?.firstName} {''} {user?.lastName}
-        <p>You Have {posts.length} posts</p>
-        </div>
+        <>
+        <ProfileInfo/>
+        <MyPosts/>
+        </>
     );
 };
 

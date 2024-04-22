@@ -6,10 +6,16 @@ import NotificationIcon from "../../assets/icons/notification.svg";
 import FbLogo from "../../assets/images/fblogo.png";
 import Logout from "../Form/Logout";
 import { useAuth } from "../../hooks/useAuth";
+import { useProfile } from "../../hooks/useProfile";
 
 const Header = () => {
   const { auth } = useAuth();
-  console.log(auth);
+  const  {state} = useProfile();
+
+  const user = state?.user ?? auth?.user;
+
+  // console.log(auth, state);
+
   return (
     <nav className="sticky top-0 z-50 border-b border-[#3F3F3F] bg-[#1E1F24] py-4">
       <div className="container flex flex-col items-center justify-between gap-6 sm:flex-row">
@@ -35,13 +41,13 @@ const Header = () => {
             Login
           </Link>
           <h2 className="text-xl font-bold">
-            {auth.user.firstName} {auth.user.lastName}
+            {user?.firstName} {user?.lastName}
           </h2>
           <button className="flex-center !ml-8 gap-3">
             <Link to="/me">
               <img
                 className="max-h-[32px] max-w-[32px] lg:max-h-[44px] lg:max-w-[44px]"
-                src={auth.user.avatar}
+                src={`${import.meta.env.VITE_SERVER_BASE_URL}/${user?.avatar}`}
                 alt="USEr Image"
                 width={50}
               />
