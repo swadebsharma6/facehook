@@ -22,10 +22,8 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_BASE_URL}/auth/login`,
-        data
-      );
-      console.log(response);
+        `${import.meta.env.VITE_SERVER_BASE_URL}/auth/login`,data);
+        // console.log(response);
 
       if (response.status === 200) {
         const { token, user } = response.data;
@@ -33,7 +31,8 @@ const LoginForm = () => {
           const authToken = token.token;
           const refreshToken = token.refreshToken;
 
-          console.log(`Login time auth Token: ${authToken}  `);
+          // console.log(`Login time auth Token: ${authToken} and  RefreshToken:${refreshToken} `);
+
           setAuth({ user, authToken, refreshToken });
 
           navigate("/");
@@ -87,7 +86,7 @@ const LoginForm = () => {
             </span>
           )}
         </div>
-        <p>{errors?.root?.random?.message}</p>
+        <p className="text-red-500 text-xl font-bold">{errors?.root?.random?.message}</p>
         <button
           className="auth-input bg-lwsGreen font-bold text-deepDark transition-all hover:opacity-90"
           type="submit"

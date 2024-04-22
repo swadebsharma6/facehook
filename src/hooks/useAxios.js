@@ -1,72 +1,67 @@
-import { useEffect } from "react"
-import { api } from "../api"
-import { useAuth } from "./useAuth"
+import { useEffect } from "react";
+import { api } from "../api";
+import { useAuth } from "./useAuth";
 import axios from "axios";
 
+const useAxios = () => {
+  const { auth, setAuth } = useAuth();
 
+  useEffect(() => {
+    // Add a request interceptor
+    const requestInterceptor = api.interceptors.request.use(
+      (config) => {
+        const authToken = auth?.authToken;
+        if (authToken) {
+          config.headers.Authorization = `Bearer ${authToken}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-const useAxios =()=>{
+    // Add a response interceptor
+    const responseInterceptor = api.interceptors.response.use(
+      (response) => response,
 
-    const {auth, setAuth} = useAuth();
+      async (error) => {
+        const originalRequest = error.config;
 
-    useEffect(()=>{
+        if (error.response.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
 
-        // Add a request interceptor
-       const requestInterceptor = api.interceptors.request.use(
-            (config)=>{
-               const authToken = auth?.authToken;
-               if(authToken){
-                config.headers.Authorization = `Bearer ${authToken}`
-               }
-               return config;
-            },
-            (error)=> Promise.reject(error)
-        )
+          try {
+            const refreshToken = auth?.refreshToken;
 
-        // Add a response interceptor
-       const responseInterceptor = api.interceptors.response.use(
-            (response)=> response, 
+            const response = await axios.post(
+              `${import.meta.env.VITE_SERVER_BASE_URL}/auth/refresh-token`,
+              { refreshToken }
+            );
 
-            async(error)=>{
+            const { token } = response.data;
 
-                const originalRequest = error.config;
+            console.log(`New Token : ${token}`);
+            setAuth({ ...auth, authToken: token });
 
-                if(error.response.status === 401 && !originalRequest._retry){
-                    originalRequest._retry =  true;
+            originalRequest.headers.Authorization = `Bearer ${token}`;
 
-                    try{
-                        const refreshToken = auth?.refreshToken;
+            return axios(originalRequest);
+          } catch (error) {
+            console.log(error);
+            throw error;
+          }
+        }
 
-                    const response = await axios.post(`${import.meta.env.VITE_SERVER_BASE_URL}/auth/refresh-token`,{ refreshToken});
+        return Promise.reject(error);
+      }
+    );
 
-                    const {token} = response.data;
+    return () => {
+      api.interceptors.request.eject(requestInterceptor);
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, [auth, setAuth, auth.authToken]);
 
-                    console.log(`New Token : ${token}`);
-                    setAuth({...auth, authToken: token })
-
-                    originalRequest.headers.Authorization = `Bearer ${token}`
-
-                    return axios(originalRequest)
-                    }
-                    catch(error){
-                        console.log(error);
-                        throw error;
-                    }        
-                }
-
-                return Promise.reject(error)
-            }
-        );
-
-       return ()=>{
-        api.interceptors.request.eject(requestInterceptor);
-        api.interceptors.response.eject(responseInterceptor);
-       }
-
-    }, [auth, setAuth]);
-
-    return {api}
-}
-
+  return { api };
+};
 
 export default useAxios;
